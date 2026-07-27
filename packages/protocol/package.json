@@ -1,0 +1,29 @@
+{
+  "name": "@notifique/push-protocol",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Shared Push device registration contract and fixtures for Notifique SDKs",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./fixtures/*": "./fixtures/*"
+  },
+  "files": [
+    "dist",
+    "fixtures",
+    "openapi-fragment.json"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "node --test dist/index.test.js"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.2",
+    "typescript": "^5.8.0"
+  }
+}

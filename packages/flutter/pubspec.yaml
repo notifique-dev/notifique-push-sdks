@@ -1,0 +1,24 @@
+name: notifique_push
+description: Official Notifique Flutter SDK for push notifications (FCM / APNs public device registration).
+version: 0.1.0
+homepage: https://docs.notifique.dev/push-api/integracao/flutter
+repository: https://github.com/notifique/notifique-push-sdks
+issue_tracker: https://github.com/notifique/notifique-push-sdks/issues
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.16.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.2.2
+  package_info_plus: ^8.0.0
+  firebase_messaging: ^15.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:

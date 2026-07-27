@@ -1,0 +1,64 @@
+{
+  "androidPublicOk": {
+    "request": {
+      "appId": "clxxapp_example",
+      "platform": "android",
+      "token": "fcm-token-example",
+      "packageName": "com.example.app"
+    },
+    "response": {
+      "success": true,
+      "data": {
+        "id": "clxxdevice_example",
+        "appId": "clxxapp_example",
+        "platform": "android",
+        "externalUserId": null,
+        "createdAt": "2026-07-27T12:00:00.000Z"
+      }
+    }
+  },
+  "iosPublicOk": {
+    "request": {
+      "appId": "clxxapp_example",
+      "platform": "ios",
+      "token": "aabbccddeeff00112233445566778899",
+      "bundleId": "com.example.app"
+    },
+    "response": {
+      "success": true,
+      "data": {
+        "id": "clxxdevice_ios_example",
+        "appId": "clxxapp_example",
+        "platform": "ios",
+        "createdAt": "2026-07-27T12:00:00.000Z"
+      }
+    }
+  },
+  "contactIdPublicRejected": {
+    "request": {
+      "appId": "clxxapp_example",
+      "platform": "android",
+      "token": "fcm-token-example",
+      "packageName": "com.example.app",
+      "contactId": "clxxcontact"
+    },
+    "response": {
+      "success": false,
+      "error": "Forbidden",
+      "code": "CONTACT_ID_REQUIRES_AUTH"
+    }
+  },
+  "packageMismatch": {
+    "request": {
+      "appId": "clxxapp_example",
+      "platform": "android",
+      "token": "fcm-token-example",
+      "packageName": "com.evil.app"
+    },
+    "response": {
+      "success": false,
+      "error": "Forbidden",
+      "code": "PACKAGE_NOT_ALLOWED"
+    }
+  }
+}

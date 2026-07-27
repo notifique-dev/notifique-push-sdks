@@ -1,0 +1,10 @@
+{
+  "paths": {
+    "/v1/push/devices": {
+      "post": {
+        "summary": "Register push device (public with appId or authenticated)",
+        "description": "Public: no API Key. Web requires allowedOrigins. Android requires packageName matching androidPackageName. iOS requires bundleId matching apnsBundleId. contactId requires API Key."
+      }
+    }
+  }
+}

@@ -1,0 +1,47 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Dependencies / build
+node_modules/
+.dart_tool/
+.packages
+build/
+dist/
+*.iml
+Pods/
+.gradle/
+.swiftpm/
+.build/
+local.properties
+*.xcuserdata
+
+# Env / secrets
+.env
+.env.*
+google-services.json
+GoogleService-Info.plist
+*.p8
+*-firebase-adminsdk-*.json
+
+# Logs
+*.log
+npm-debug.log*
+node_modules/
+dist/
+build/
+.dart_tool/
+*.iml
+.idea/
+local.properties
+.gradle/
+packages/**/build/
+packages/android/.gradle/
+packages/ios/.build/
+packages/ios/.swiftpm/

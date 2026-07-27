@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  protocol:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/protocol
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm install
+      - run: npm run build
+      - run: npm test
+
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm install
+      - run: npm run build
+      - run: npm test
+
+  react-native:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/react-native
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm install
+      - run: npm test
+
+  flutter:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/flutter
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      - run: flutter test
+
+  android:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/android
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - run: chmod +x gradlew || true
+      - run: ./gradlew test --no-daemon
+
+  ios:
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: packages/ios
+    steps:
+      - uses: actions/checkout@v4
+      - name: Swift tests
+        run: swift test

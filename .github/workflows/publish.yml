@@ -1,0 +1,71 @@
+name: Publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type PUBLISH to confirm'
+        required: true
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Confirm
+        if: github.event.inputs.confirm != 'PUBLISH'
+        run: |
+          echo "Refusing to publish without confirmation"
+          exit 1
+      - uses: actions/checkout@v4
+      - name: Require tag
+        run: |
+          git fetch --tags
+          git describe --exact-match --tags HEAD || (echo "Checkout a release tag like v0.1.0 first" && exit 1)
+
+  npm-web:
+    needs: gate
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          registry-url: https://registry.npmjs.org
+      - run: npm install && npm run build && npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  npm-rn:
+    needs: gate
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/react-native
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          registry-url: https://registry.npmjs.org
+      - run: npm install && npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  pub-flutter:
+    needs: gate
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/flutter
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      - run: dart pub publish --force
+        env:
+          PUB_CREDENTIALS: ${{ secrets.PUB_CREDENTIALS }}

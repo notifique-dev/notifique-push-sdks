@@ -1,4 +1,4 @@
-# Notifique Push — iOS (Swift)
+# Notifique Push (iOS / Swift)
 
 SDK iOS oficial da Notifique para registro público de dispositivos APNs.
 

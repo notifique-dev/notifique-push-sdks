@@ -21,6 +21,10 @@ Pods/
 .build/
 local.properties
 *.xcuserdata
+packages/**/build/
+packages/android/.gradle/
+packages/ios/.build/
+packages/ios/.swiftpm/
 
 # Env / secrets
 .env
@@ -33,15 +37,3 @@ GoogleService-Info.plist
 # Logs
 *.log
 npm-debug.log*
-node_modules/
-dist/
-build/
-.dart_tool/
-*.iml
-.idea/
-local.properties
-.gradle/
-packages/**/build/
-packages/android/.gradle/
-packages/ios/.build/
-packages/ios/.swiftpm/

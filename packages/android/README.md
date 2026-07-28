@@ -1,4 +1,4 @@
-# Notifique Push — Android (Kotlin)
+# Notifique Push (Android / Kotlin)
 
 SDK Android oficial da Notifique para registro público de dispositivos FCM.
 
@@ -14,7 +14,7 @@ dependencies {
 }
 ```
 
-Publicação Maven Central ainda em andamento — enquanto isso, publique localmente:
+Publicação no Maven Central ainda em andamento. Enquanto isso, publique localmente:
 
 ```bash
 ./gradlew :push:publishToMavenLocal

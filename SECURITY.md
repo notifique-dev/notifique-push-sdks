@@ -1,4 +1,4 @@
-# Security Policy — Notifique Push SDKs
+# Security Policy (Notifique Push SDKs)
 
 ## Client security model
 

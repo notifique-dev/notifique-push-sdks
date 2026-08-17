@@ -1,0 +1,13 @@
+{
+  "to": ["clxxdevice1..."],
+  "type": "push",
+  "payload": {
+    "title": "Olá!",
+    "body": "Você tem uma nova mensagem.",
+    "url": "https://seusite.com/notificacoes",
+    "icon": "https://seusite.com/icon.png"
+  },
+  "options": {
+    "priority": "normal"
+  }
+}

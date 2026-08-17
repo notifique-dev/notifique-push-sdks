@@ -2,13 +2,13 @@
 
 SDK Flutter oficial da Notifique para push (Android + iOS).
 
-**Versão:** `0.1.0`
+**Versão:** `0.2.0`
 
 ## Instalação
 
 ```yaml
 dependencies:
-  notifique_push: ^0.1.0
+  notifique_push: ^0.2.0
   firebase_core: ^3.0.0
   firebase_messaging: ^15.0.0
 ```
@@ -19,13 +19,15 @@ dependencies:
 import 'package:notifique_push/notifique_push.dart';
 import 'package:notifique_push/firebase_messaging_adapter.dart';
 
+final firebaseMessaging = FirebasePushMessaging();
+
 await NotifiquePush.init(
   appId: 'clxxapp...',
   autoRequestPermission: true,
-  messaging: FirebasePushMessaging(),
-  // packageName / bundleId são obtidos via package_info_plus quando omitidos
+  messaging: firebaseMessaging,
 );
 
+firebaseMessaging.attachOpenHandlers();
 NotifiquePush.setExternalUserId('user-123'); // opcional
 final deviceId = NotifiquePush.getDeviceId();
 ```
@@ -46,14 +48,12 @@ await NotifiquePush.init(
 
 | Método | Descrição |
 |--------|-----------|
-| `init(...)` | `appId`, `apiBase?`, `autoRequestPermission?`, `messaging?` |
-| `requestPermission()` | Solicita permissão e registra o token |
-| `getPermissionStatus()` | Status atual |
-| `getDeviceId()` | ID retornado por `POST /v1/push/devices` |
-| `setExternalUserId(id?)` | Associa usuário externo |
-| `unregister()` | Limpa estado local |
-| `addEventListener` | Eventos de registro / permissão / erro |
-| `register(token)` | `POST` público (`packageName` no Android, `bundleId` no iOS) |
+| `init(...)` | `appId`, `apiBase?`, `messaging?`, `packageName` / `bundleId` |
+| `requestPermission()` | Permissão + registro |
+| `getDeviceId()` | ID do `POST /v1/push/devices` |
+| `handleNotificationOpen(data)` | Parse + `reportClick` + `NotificationOpenedEvent` |
+| `reportClick(...)` | `POST /v1/push/events/click` |
+| `register(token)` | Registro público |
 
 O SDK **nunca** envia `contactId` nem API Key.
 

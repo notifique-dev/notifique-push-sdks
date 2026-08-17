@@ -101,4 +101,42 @@ describe("NotifiquePush", () => {
     expect(body).not.toHaveProperty("packageName");
     expect(body).not.toHaveProperty("contactId");
   });
+
+  it("reports click via public endpoint", async () => {
+    const urls: string[] = [];
+    const fetchMock: typeof fetch = async (input, init) => {
+      urls.push(String(input));
+      return new Response(JSON.stringify({ success: true }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    };
+
+    await NotifiquePush.init({
+      appId: "clxxapp_example",
+      apiBase: "https://api.test.notifique",
+      autoRequestPermission: false,
+      fetch: fetchMock,
+    });
+
+    await NotifiquePush.reportClick({ logId: "log1", action: "default" });
+    expect(urls[0]).toContain("/v1/push/events/click");
+    expect(urls[0]).toContain("log_id=log1");
+  });
+
+  it("handleNotificationOpen emits notificationOpened", async () => {
+    const events: string[] = [];
+    await NotifiquePush.init({
+      appId: "clxxapp_example",
+      apiBase: "https://api.test.notifique",
+      autoRequestPermission: false,
+      fetch: async () =>
+        new Response(JSON.stringify({ success: true }), { status: 200 }),
+    });
+    NotifiquePush.addEventListener((event) => {
+      if (event.type === "notificationOpened") events.push("opened");
+    });
+    await NotifiquePush.handleNotificationOpen({ log_id: "log1", url: "https://example.com" });
+    expect(events).toEqual(["opened"]);
+  });
 });

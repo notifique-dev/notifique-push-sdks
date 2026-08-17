@@ -66,6 +66,7 @@ object NotifiquePush {
         data class Registered(val deviceId: String) : PushEvent()
         data class Unregistered(val deviceId: String?) : PushEvent()
         data class PermissionChanged(val status: PermissionStatus) : PushEvent()
+        data class NotificationOpened(val payload: PushPayload) : PushEvent()
         data class Error(val message: String, val cause: Throwable? = null) : PushEvent()
     }
 
@@ -204,6 +205,48 @@ object NotifiquePush {
             registeredId
         }
     }
+
+    /**
+     * Reports notification click (public endpoint). Prefer [PushPayload.clickReportUrl] when set.
+     */
+    suspend fun reportClick(logId: String? = null, clickReportUrl: String? = null, action: String = "default") {
+        ensureInitialized()
+        val url = when {
+            !clickReportUrl.isNullOrBlank() -> clickReportUrl
+            !logId.isNullOrBlank() -> "$apiBase/v1/push/events/click?log_id=${encodeURIComponent(logId)}"
+            else -> throw NotifiquePushException("logId or clickReportUrl is required")
+        }
+        val body = if (clickReportUrl.isNullOrBlank()) {
+            """{"log_id":${jsonString(logId!!)},"action":${jsonString(action)}}"""
+        } else {
+            """{"action":${jsonString(action)}}"""
+        }
+        val request = Request.Builder()
+            .url(url)
+            .post(body.toRequestBody(JSON))
+            .header("Content-Type", "application/json")
+            .build()
+        runCatching { httpClient.newCall(request).execute().close() }
+    }
+
+    /**
+     * Parses FCM data map, optionally reports click, and emits [PushEvent.NotificationOpened].
+     */
+    suspend fun handleNotificationOpen(
+        data: Map<String, String>,
+        action: String = "default",
+        report: Boolean = true,
+    ): PushPayload {
+        val payload = PushPayload.fromMap(data)
+        if (report) {
+            reportClick(payload.logId, payload.clickReportUrl, action)
+        }
+        emit(PushEvent.NotificationOpened(payload))
+        return payload
+    }
+
+    private fun encodeURIComponent(value: String): String =
+        java.net.URLEncoder.encode(value, Charsets.UTF_8)
 
     internal fun buildRegisterJson(
         appId: String,

@@ -84,6 +84,7 @@ public enum NotifiquePush {
         case registered(deviceId: String)
         case unregistered(deviceId: String?)
         case permissionChanged(PermissionStatus)
+        case notificationOpened(payload: PushPayload)
         case error(message: String)
     }
 
@@ -277,6 +278,49 @@ public enum NotifiquePush {
         }
         emit(.registered(deviceId: registeredId))
         return registeredId
+    }
+
+    /// Reports notification click (public endpoint).
+    public static func reportClick(
+        logId: String? = nil,
+        clickReportUrl: String? = nil,
+        action: String = "default"
+    ) async throws {
+        try ensureInitialized()
+        let snapshot = queue.sync { (_apiBase, _httpClient) }
+        let urlString: String
+        let body: [String: Any]
+        if let clickReportUrl, !clickReportUrl.isEmpty {
+            urlString = clickReportUrl
+            body = ["action": action]
+        } else if let logId, !logId.isEmpty {
+            urlString = "\(snapshot.0)/v1/push/events/click?log_id=\(logId.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? logId)"
+            body = ["log_id": logId, "action": action]
+        } else {
+            throw NotifiquePushError.message("logId or clickReportUrl is required")
+        }
+
+        let url = URL(string: urlString)!
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try JSONSerialization.data(withJSONObject: body)
+        _ = try await snapshot.1.data(for: request)
+    }
+
+    /// Parses userInfo, optionally reports click, and emits notificationOpened.
+    @discardableResult
+    public static func handleNotificationResponse(
+        userInfo: [AnyHashable: Any],
+        action: String = "default",
+        report: Bool = true
+    ) async throws -> PushPayload {
+        let payload = PushPayload.from(userInfo: userInfo)
+        if report {
+            try await reportClick(logId: payload.logId, clickReportUrl: payload.clickReportUrl, action: action)
+        }
+        emit(.notificationOpened(payload: payload))
+        return payload
     }
 
     /// Converts raw APNs `Data` token to lowercase hex (required by Notifique).

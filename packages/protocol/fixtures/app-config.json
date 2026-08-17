@@ -1,0 +1,10 @@
+{
+  "success": true,
+  "vapidPublicKey": "BEl62iU...",
+  "promptConfig": {
+    "type": "native",
+    "autoPrompt": true,
+    "showAfterPageviews": 2,
+    "delaySeconds": 20
+  }
+}

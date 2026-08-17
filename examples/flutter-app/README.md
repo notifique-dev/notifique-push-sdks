@@ -1,15 +1,21 @@
-# Exemplo Flutter
+# Flutter example
 
-App mínimo usando `notifique_push: ^0.1.0`.
-
-```dart
-import 'package:notifique_push/notifique_push.dart';
-import 'package:notifique_push/firebase_messaging_adapter.dart';
-
-await NotifiquePush.init(
-  appId: 'clxxapp...',
-  messaging: FirebasePushMessaging(),
-);
+```bash
+flutter pub add notifique_push firebase_core firebase_messaging
 ```
 
-Veja o [README do pacote](../../packages/flutter/README.md) e a [doc Flutter](https://docs.notifique.dev/push-api/integracao/flutter).
+```dart
+import 'package:notifique_push/firebase_messaging_adapter.dart';
+import 'package:notifique_push/notifique_push.dart';
+
+final firebaseMessaging = FirebasePushMessaging();
+
+await NotifiquePush.init(
+  appId: 'YOUR_APP_ID',
+  messaging: firebaseMessaging,
+);
+
+firebaseMessaging.attachOpenHandlers();
+```
+
+Handle cold start with `FirebaseMessaging.instance.getInitialMessage()` and call `NotifiquePush.handleNotificationOpen(message.data)`.

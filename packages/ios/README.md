@@ -2,11 +2,11 @@
 
 SDK iOS oficial da Notifique para registro público de dispositivos APNs.
 
-**Versão:** `0.1.0` · Swift Package `NotifiquePush`
+**Versão:** `0.2.0` · Swift Package `NotifiquePush`
 
 ## Instalação (SPM)
 
-No Xcode: **File → Add Package Dependencies…** e aponte para o monorepo / tag `v0.1.0`, produto `NotifiquePush`.
+No Xcode: **File → Add Package Dependencies…** → URL do monorepo GitHub, versão **0.2.0** / tag `v0.2.0`, produto `NotifiquePush`.
 
 Para desenvolvimento local:
 
@@ -48,6 +48,8 @@ let deviceId = NotifiquePush.getDeviceId()
 | `unregister()` | Limpa estado local do device |
 | `addEventListener` | Eventos de registro / permissão / erro |
 | `register(token:)` | `POST` público com `platform=ios` + `bundleId` + token APNs hex |
+| `handleNotificationResponse(userInfo:)` | Parse + `reportClick` + evento `notificationOpened` |
+| `reportClick(logId:, clickReportUrl:)` | `POST /v1/push/events/click` |
 | `hexToken(from:)` | Converte `Data` APNs → hex |
 
 O SDK **nunca** envia `contactId` nem API Key. O registro público exige que `bundleId` bata com o Push App no painel.

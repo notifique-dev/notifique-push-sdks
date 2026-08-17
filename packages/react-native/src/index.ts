@@ -1,5 +1,7 @@
 /** Official Notifique Push SDK for React Native. */
 
+import { parsePushPayload, type PushIncomingPayload } from "./payload";
+
 export type PermissionStatus = "granted" | "denied" | "unknown";
 
 export type PushPlatform = "android" | "ios";
@@ -8,6 +10,7 @@ export type PushEvent =
   | { type: "registered"; deviceId: string }
   | { type: "unregistered"; deviceId: string | null }
   | { type: "permissionChanged"; status: PermissionStatus }
+  | { type: "notificationOpened"; payload: PushIncomingPayload }
   | { type: "error"; message: string; cause?: unknown };
 
 export type PushEventListener = (event: PushEvent) => void;
@@ -185,6 +188,53 @@ export async function register(token: string): Promise<string> {
   return json.data.id;
 }
 
+/**
+ * Reports a notification click to Notifique (public endpoint).
+ * Prefer `clickReportUrl` from the payload when available.
+ */
+export async function reportClick(
+  input: { logId?: string; clickReportUrl?: string; action?: string; apiBase?: string },
+): Promise<void> {
+  const action = input.action ?? "default";
+  const base = trimBase(input.apiBase ?? state.apiBase);
+  if (input.clickReportUrl) {
+    await state.fetchImpl(input.clickReportUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action }),
+    }).catch(() => undefined);
+    return;
+  }
+  if (!input.logId) throw new Error("logId or clickReportUrl is required");
+  await state.fetchImpl(
+    `${base}/v1/push/events/click?log_id=${encodeURIComponent(input.logId)}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ log_id: input.logId, action }),
+    },
+  ).catch(() => undefined);
+}
+
+/**
+ * Parses mobile notification data and optionally reports click + emits event.
+ */
+export async function handleNotificationOpen(
+  raw: unknown,
+  options?: { action?: string; report?: boolean },
+): Promise<PushIncomingPayload> {
+  const payload = parsePushPayload(raw);
+  if (options?.report !== false) {
+    await reportClick({
+      logId: payload.logId,
+      clickReportUrl: payload.clickReportUrl,
+      action: options?.action,
+    });
+  }
+  emit({ type: "notificationOpened", payload });
+  return payload;
+}
+
 export const NotifiquePush = {
   async init(options: InitOptions): Promise<void> {
     const appId = options.appId?.trim();
@@ -283,6 +333,25 @@ export const NotifiquePush = {
 
   register,
 
+  reportClick,
+  handleNotificationOpen,
+  parsePushPayload,
+
+  /**
+   * Attach Firebase Messaging `onNotificationOpenedApp` to report clicks.
+   * Requires `@react-native-firebase/messaging` or compatible API.
+   */
+  attachNotificationOpenHandler(
+    messaging: {
+      onNotificationOpenedApp: (callback: (message: { data?: Record<string, string> }) => void) => () => void;
+    },
+    options?: { report?: boolean },
+  ): () => void {
+    return messaging.onNotificationOpenedApp((message) => {
+      void handleNotificationOpen(message.data ?? {}, options);
+    });
+  },
+
   /** @internal */
   resetForTests(): void {
     state.unsubscribeTokenRefresh?.();
@@ -303,4 +372,5 @@ export const NotifiquePush = {
   },
 };
 
+export { parsePushPayload, type PushIncomingPayload } from "./payload";
 export default NotifiquePush;

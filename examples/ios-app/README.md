@@ -1,14 +1,18 @@
-# Exemplo iOS
-
-App mínimo usando o Swift Package `NotifiquePush`.
+# iOS example
 
 ```swift
-import NotifiquePush
+NotifiquePush.configure(
+    InitOptions(appId: "YOUR_APP_ID", bundleId: "com.example.app")
+)
 
-NotifiquePush.configure(appId: "clxxapp...", autoRequestPermission: true)
-
-// didRegisterForRemoteNotificationsWithDeviceToken:
+// application(_:didRegisterForRemoteNotificationsWithDeviceToken:)
 NotifiquePush.didRegisterForRemoteNotifications(deviceToken: deviceToken)
+
+// UNUserNotificationCenterDelegate — ao abrir notificação:
+Task {
+    let payload = try await NotifiquePush.handleNotificationResponse(userInfo: response.notification.request.content.userInfo)
+    if let url = payload.url { /* deep link */ }
+}
 ```
 
-Veja o [README do pacote](../../packages/ios/README.md) e a [doc iOS](https://docs.notifique.dev/push-api/integracao/ios).
+See [packages/ios/README.md](../packages/ios/README.md).

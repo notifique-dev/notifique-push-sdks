@@ -4,8 +4,11 @@
 /// `import 'package:notifique_push/firebase_messaging_adapter.dart';`
 library;
 
+import 'dart:async';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:notifique_push/src/messaging.dart';
+import 'package:notifique_push/src/notifique_push.dart';
 import 'package:notifique_push/src/types.dart';
 
 class FirebasePushMessaging implements PushMessaging {
@@ -42,5 +45,17 @@ class FirebasePushMessaging implements PushMessaging {
       case AuthorizationStatus.notDetermined:
         return PermissionStatus.unknown;
     }
+  }
+
+  /// Wires Firebase open-app / background-tap handlers to Notifique click reporting.
+  void attachOpenHandlers({bool reportClick = true}) {
+    FirebaseMessaging.onMessageOpenedApp.listen((message) {
+      unawaited(
+        NotifiquePush.handleNotificationOpen(
+          Map<String, dynamic>.from(message.data),
+          report: reportClick,
+        ),
+      );
+    });
   }
 }

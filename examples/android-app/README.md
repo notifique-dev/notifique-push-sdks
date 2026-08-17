@@ -1,13 +1,18 @@
-# Exemplo Android
+# Android example
 
-App mínimo usando `dev.notifique:push:0.1.0`.
+Register FCM token and report notification clicks:
 
 ```kotlin
-NotifiquePush.init(
-    appId = "clxxapp...",
-    packageName = applicationContext.packageName,
-    tokenProvider = { FirebaseMessaging.getInstance().token.await() },
-)
+// Após obter token FCM
+lifecycleScope.launch {
+    NotifiquePush.register(token)
+}
+
+// No FirebaseMessagingService.onMessageReceived ou ao abrir notificação:
+lifecycleScope.launch {
+    val payload = NotifiquePush.handleNotificationOpen(message.data)
+    payload.url?.let { openUrl(it) }
+}
 ```
 
-Veja o [README do pacote](../../packages/android/README.md) e a [doc Android](https://docs.notifique.dev/push-api/integracao/android).
+Configure `NotifiquePush.init` with `packageName` and `tokenProvider` — see [packages/android/README.md](../packages/android/README.md).

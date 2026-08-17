@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:package_info_plus/package_info_plus.dart';
 
 import 'messaging.dart';
+import 'payload.dart';
 import 'types.dart';
 
 /// Official Notifique Push SDK for Flutter.
@@ -207,6 +208,56 @@ class NotifiquePush {
     _permissionStatus = PermissionStatus.granted;
     _emit(RegisteredEvent(id));
     return id;
+  }
+
+  /// Reports notification click to the public events endpoint.
+  static Future<void> reportClick({
+    String? logId,
+    String? clickReportUrl,
+    String action = 'default',
+  }) async {
+    _ensureInitialized();
+    try {
+      if (clickReportUrl != null && clickReportUrl.isNotEmpty) {
+        await _httpClient.post(
+          Uri.parse(clickReportUrl),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({'action': action}),
+        );
+        return;
+      }
+      if (logId == null || logId.isEmpty) {
+        throw ArgumentError('logId or clickReportUrl is required');
+      }
+      final uri = Uri.parse(
+        '$_apiBase/v1/push/events/click?log_id=${Uri.encodeComponent(logId)}',
+      );
+      await _httpClient.post(
+        uri,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'log_id': logId, 'action': action}),
+      );
+    } catch (_) {
+      // Public reporting is best-effort (parity with web/RN).
+    }
+  }
+
+  /// Parses notification data, optionally reports click, and emits event.
+  static Future<PushIncomingPayload> handleNotificationOpen(
+    Map<String, dynamic> raw, {
+    String action = 'default',
+    bool report = true,
+  }) async {
+    final payload = parsePushPayload(raw);
+    if (report) {
+      await reportClick(
+        logId: payload.logId,
+        clickReportUrl: payload.clickReportUrl,
+        action: action,
+      );
+    }
+    _emit(NotificationOpenedEvent(payload));
+    return payload;
   }
 
   /// Resets SDK state — for unit tests only.

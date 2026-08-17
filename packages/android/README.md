@@ -2,13 +2,13 @@
 
 SDK Android oficial da Notifique para registro público de dispositivos FCM.
 
-**Versão:** `0.1.0` · Coordenadas Maven: `dev.notifique:push:0.1.0`
+**Versão:** `0.2.0` · Coordenadas Maven: `dev.notifique:push:0.2.0`
 
 ## Instalação
 
 ```kotlin
 dependencies {
-    implementation("dev.notifique:push:0.1.0")
+    implementation("dev.notifique:push:0.2.0")
     // Firebase Messaging no app do cliente
     implementation("com.google.firebase:firebase-messaging")
 }
@@ -54,8 +54,10 @@ val deviceId = NotifiquePush.getDeviceId()
 | `getDeviceId()` | ID retornado por `POST /v1/push/devices` |
 | `setExternalUserId(id?)` | Associa usuário externo e re-registra |
 | `unregister()` | Limpa estado local do device |
-| `addEventListener` | Eventos `Registered`, `Unregistered`, `PermissionChanged`, `Error` |
+| `addEventListener` | `Registered`, `Unregistered`, `PermissionChanged`, `NotificationOpened`, `Error` |
 | `register(token)` | `POST` público com `platform=android` + `packageName` |
+| `handleNotificationOpen(data)` | Parse FCM data + `reportClick` + evento `NotificationOpened` |
+| `reportClick(logId?, clickReportUrl?)` | `POST /v1/push/events/click` |
 
 O SDK **nunca** envia `contactId` nem API Key. O registro público exige que `packageName` bata com o Push App no painel.
 

@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.2.0 (2026-08-17)
+
+Full parity with Notifique Push API and hosted web script.
+
+### Added
+
+- `@notifique/push-server` — complete authenticated API client (apps, devices, messages)
+- Web: popup subscribe, `isSubscribed`, `openSubscribePopup`, embedded SW, `promptConfig`, click/delivered reporting
+- Mobile: `reportClick`, `handleNotificationOpen`, `parsePushPayload`, `notificationOpened` events
+- Flutter `FirebasePushMessaging.attachOpenHandlers()`
+- RN `attachNotificationOpenHandler()`
+
+### Changed
+
+- Server client supports `Authorization: Bearer` and `x-api-key`
+- Send contract: `to` + `type` + `payload` → `messageIds` only in SDK types
+
+
 ## 0.1.0 (2026-07-27)
 
 First public release of Notifique client Push SDKs.

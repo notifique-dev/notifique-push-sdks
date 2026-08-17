@@ -50,22 +50,22 @@ jobs:
         with:
           node-version: "22"
           registry-url: https://registry.npmjs.org
-      - run: npm install && npm publish --access public
+      - run: npm install && npm run build && npm test && npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-  pub-flutter:
     needs: gate
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: packages/flutter
+        working-directory: packages/server
     steps:
       - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
+      - uses: actions/setup-node@v4
         with:
-          channel: stable
-      - run: flutter pub get
-      - run: dart pub publish --force
+          node-version: "22"
+          registry-url: https://registry.npmjs.org
+      - run: npm install && npm run build && npm test && npm publish --access public
         env:
-          PUB_CREDENTIALS: ${{ secrets.PUB_CREDENTIALS }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  # Flutter: use publish-pubdev.yml (push de tag v* + OIDC em pub.dev).

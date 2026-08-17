@@ -1,6 +1,6 @@
 # @notifique/push
 
-Official **Web Push** SDK for [Notifique](https://notifique.dev).
+Official **Web Push** SDK for [Notifique](https://notifique.dev). Paridade com o script hospedado `notifique-push.js`.
 
 ## Install
 
@@ -10,28 +10,36 @@ npm install @notifique/push
 
 ## Usage
 
-1. Configure **allowed domains** on the Push App in the dashboard.
-2. Serve `sw-loader.js` as `/sw.js` (download from the dashboard).
-3. Initialize:
-
 ```ts
 import { NotifiquePush } from '@notifique/push';
 
-await NotifiquePush.init({
-  appId: 'YOUR_PUSH_APP_ID',
-  swPath: '/sw.js',
-});
+await NotifiquePush.init({ appId: 'YOUR_PUSH_APP_ID', swPath: '/sw.js' });
 
-// Or with a custom button:
 document.getElementById('enable')?.addEventListener('click', () => {
   NotifiquePush.requestPermissionAndRegister();
 });
 ```
 
-CDN / script tag (IIFE build): use the npm package build or the hosted script at `https://api.notifique.dev/v1/push/scripts/notifique-push.js`.
+### Sem `sw.js` no domínio
 
-## Security
+```ts
+await NotifiquePush.init({ appId: 'YOUR_APP_ID' });
+// fallback automático: SW embutido ou popup subscribe
+await NotifiquePush.openSubscribePopup();
+```
 
-Never put API Keys in the browser. Link CRM `contactId` from your backend with `sk_live_...`.
+### API pública
 
-Docs: https://docs.notifique.dev/push-api/integracao
+| Método | Descrição |
+|--------|-----------|
+| `init` | Config + `promptConfig` do painel |
+| `requestPermissionAndRegister` | Permissão + registro |
+| `getAppConfig` | VAPID + prompt |
+| `isSubscribed` | Estado local |
+| `reportClick` / `reportDelivered` | Eventos públicos |
+| `parsePushPayload` | Parse de payload recebido |
+| `openSubscribePopup` | Wix / Shopify |
+
+CDN alternativa: `https://api.notifique.dev/v1/push/scripts/notifique-push.js`
+
+Docs: https://docs.notifique.dev/push-api/integracao/credenciais-web

@@ -2,8 +2,32 @@
   "paths": {
     "/v1/push/devices": {
       "post": {
-        "summary": "Register push device (public with appId or authenticated)",
-        "description": "Public: no API Key. Web requires allowedOrigins. Android requires packageName matching androidPackageName. iOS requires bundleId matching apnsBundleId. contactId requires API Key."
+        "summary": "Register push device (public with appId or authenticated)"
+      }
+    },
+    "/v1/push/apps/{id}/config": {
+      "get": {
+        "summary": "Public Push App config (VAPID + promptConfig)"
+      }
+    },
+    "/v1/push/apps/{id}/public-key": {
+      "get": {
+        "summary": "Public VAPID key for a Push App"
+      }
+    },
+    "/v1/push/events/click": {
+      "post": {
+        "summary": "Report notification click (public, log_id in body or query)"
+      }
+    },
+    "/v1/push/events/delivered": {
+      "post": {
+        "summary": "Report notification delivered in browser (public)"
+      }
+    },
+    "/v1/push/messages": {
+      "post": {
+        "summary": "Send push (canonical: to + type + payload → messageIds)"
       }
     }
   }

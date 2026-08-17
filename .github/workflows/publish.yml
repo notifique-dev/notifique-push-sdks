@@ -20,7 +20,7 @@ jobs:
       - name: Require tag
         run: |
           git fetch --tags
-          git describe --exact-match --tags HEAD || (echo "Checkout a release tag like v0.1.0 first" && exit 1)
+          git describe --exact-match --tags HEAD || (echo "Checkout a release tag like v0.2.0 first" && exit 1)
 
   npm-web:
     needs: gate
@@ -34,7 +34,7 @@ jobs:
         with:
           node-version: "22"
           registry-url: https://registry.npmjs.org
-      - run: npm install && npm run build && npm publish --access public
+      - run: npm install && npm run build && npm test && npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -53,6 +53,8 @@ jobs:
       - run: npm install && npm run build && npm test && npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  npm-server:
     needs: gate
     runs-on: ubuntu-latest
     defaults:
@@ -68,4 +70,4 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-  # Flutter: use publish-pubdev.yml (push de tag v* + OIDC em pub.dev).
+  # Flutter: publish-pubdev.yml (push de tag v* + OIDC em pub.dev).

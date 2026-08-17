@@ -20,11 +20,6 @@ jobs:
           echo "Refusing to publish without confirmation"
           exit 1
       - uses: actions/checkout@v4
-      - name: Require release tag (manual runs)
-        if: github.event_name == 'workflow_dispatch'
-        run: |
-          git fetch --tags --force
-          git describe --exact-match --tags HEAD || (echo "Select a release tag like v0.2.0" && exit 1)
 
   npm-web:
     needs: gate

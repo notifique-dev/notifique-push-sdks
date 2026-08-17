@@ -1,26 +1,29 @@
-name: Publish
+name: Publish npm
 
 on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
   workflow_dispatch:
     inputs:
       confirm:
-        description: 'Type PUBLISH to confirm'
+        description: 'Type PUBLISH to confirm (manual runs only)'
         required: true
 
 jobs:
   gate:
     runs-on: ubuntu-latest
     steps:
-      - name: Confirm
-        if: github.event.inputs.confirm != 'PUBLISH'
+      - name: Confirm manual publish
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.confirm != 'PUBLISH'
         run: |
           echo "Refusing to publish without confirmation"
           exit 1
       - uses: actions/checkout@v4
-      - name: Require tag
+      - name: Require release tag
         run: |
           git fetch --tags
-          git describe --exact-match --tags HEAD || (echo "Checkout a release tag like v0.2.0 first" && exit 1)
+          git describe --exact-match --tags HEAD || (echo "Checkout a release tag like v0.2.0" && exit 1)
 
   npm-web:
     needs: gate
@@ -69,5 +72,3 @@ jobs:
       - run: npm install && npm run build && npm test && npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-  # Flutter: publish-pubdev.yml (push de tag v* + OIDC em pub.dev).
